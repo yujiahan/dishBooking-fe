@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import SupplierStore from './store'
-import { Button } from 'antd-mobile';
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
+import {
+     Link
+} from 'react-router-dom'
 
 @observer
 export default class Supplier extends Component {
@@ -10,8 +12,8 @@ export default class Supplier extends Component {
         let { suppliers } = SupplierStore;
 
         return (
-            <div>
-                <Button onClick={()=>SupplierStore.addNew({id: "2", name:"xx", phone:"12323"})}></Button>
+            <div>   
+                <Link to="supplierEdit">新增供应商</Link>                   
                 { suppliers.map((supplier) =>
                     <li key={supplier.id}>{supplier.name}</li>
                 )}

@@ -7,7 +7,7 @@ const Supplier = types.model('Supplier', { // B
     phone: types.string
 })
 const SupplierStore = types.model('suppliers', { // C
-    suppliers: types.array(Supplier)
+        suppliers: types.array(Supplier)
     })
     .actions(self => ({ // A
         addNew(supplier) {
