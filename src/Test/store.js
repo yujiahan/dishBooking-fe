@@ -1,9 +1,18 @@
-import { observable} from 'mobx'
+import { autorun, extendObservable, observable} from 'mobx'
 
-class TestStore {
-    page = 1;
-    pageEntry = '';
-    @observable noMore = 'sdf';
+class Todo {
+    id = Math.random();
+    @observable aaa = 111;
+    @observable bbb = 222;
 }
-const testStore = new TestStore();
-export default testStore
+
+window.testStore = new Todo();
+window.store = observable({
+    title: 'front end developer',
+   });
+autorun(function () {
+    console.log( window.testStore.aaa + " " + window.testStore.bbb + " " +  window.testStore.aaa );
+    debugger;
+})
+
+
