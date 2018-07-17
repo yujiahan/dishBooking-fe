@@ -63,6 +63,19 @@ export default class DishConsumeEdit extends Component {
         this.setState({consumeList: this.state.consumeList})
       
     }
+        saveItemConsume () { 
+                let self = this;
+                let newConsumeList = this.props.match.params.consumeList.split(",")
+                newConsumeList.push(this.state.addItemName + "|" + this.state.addAmount);
+
+                axios.get('/dish/updateConsumeList/'+ self.props.match.params.dishId + '/' +   newConsumeList.join(","))
+                    .then(function (response) {
+                       if(response.success) {
+                           self.setState({consumeList: newConsumeList});
+                           self.setState({showAddItem: false})
+                       }
+                });
+        }
     showAdd () {
         this.setState({showAddItem: true})
     }
@@ -131,7 +144,7 @@ export default class DishConsumeEdit extends Component {
                                     }} placeholder="数量" />
                                 </Flex.Item>
                                 <Flex.Item>
-                                    <Button size="small">保存</Button>
+                                    <Button size="small" onClick={()=>{ this.saveItemConsume()}}>保存</Button>
                                 </Flex.Item>
                             </Flex>
                         </List.Item>
