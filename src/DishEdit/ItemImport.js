@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Flex, List,  WingBlank, WhiteSpace, Toast, Picker, Button, InputItem } from 'antd-mobile'
+import { Flex, List,  WhiteSpace, Toast, Picker, Button, InputItem } from 'antd-mobile'
 import axios from 'axios'
 const SORTMAP = new Map([
                             ['meat', '肉类'],
@@ -18,6 +18,7 @@ export default class ItemImport extends Component {
     state = {
         dishName: "",
         sortValue: 'meat',
+        remark: "",
         itemList: [
             {
                 code: 1,
@@ -39,8 +40,8 @@ export default class ItemImport extends Component {
             });
     }
 
-    addDishItem(sortVal, dishName) {
-        axios.get('/dish/addItem/' + sortVal + "/" + dishName).then((response) => {
+    addDishItem(sortVal, dishName, remark) {
+        axios.get('/dish/addItem/' + sortVal + "/" + dishName + "/" + remark).then((response) => {
             if (response.success) {
                 Toast.info('添加成功')
             }
@@ -66,15 +67,20 @@ export default class ItemImport extends Component {
                                     <div style={{ width: '100%', color: '#108ee9', textAlign: 'center' }}>{SORTMAP.get(this.state.sortValue)}</div>
                                 </Picker>
                             </Flex.Item>
-                            <Flex.Item>
+                            <div style={{flex:2}}> 
                                 <InputItem onChange={(val) => {
                                     this.setState({ dishName: val })
                                 }} placeholder="原料名称" />
+                            </div>
+                            <Flex.Item>
+                                <InputItem onChange={(val) => {
+                                    this.setState({ remark: val })
+                                }} placeholder="备注" />
                             </Flex.Item>
                         </Flex>
                     </List.Item>
                 </List>
-                <Button icon="check-circle-o" onClick={() => this.addDishItem(this.state.sortValue, this.state.dishName)} >确认添加</Button><WhiteSpace />
+                <Button icon="check-circle-o" onClick={() => this.addDishItem(this.state.sortValue, this.state.dishName, this.state.remark)} >确认添加</Button><WhiteSpace />
                 <div>原料list</div>
                 {
                     this.state.itemList.map((item) => {
