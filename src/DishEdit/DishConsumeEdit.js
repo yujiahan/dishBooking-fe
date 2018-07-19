@@ -51,31 +51,28 @@ export default class DishConsumeEdit extends Component {
         addAmount: ""
     }
     componentDidMount(){
-        let dishId = this.props.match.params.dishId;
-        let dishName = this.props.match.params.dishName;
         let consumeList = this.props.match.params.consumeList.split(",");
         
         this.setState({consumeList: consumeList});
     }
     deleteConsume (idx){
         this.state.consumeList.splice(idx, 1);
-
         this.setState({consumeList: this.state.consumeList})
       
     }
-        saveItemConsume () { 
-                let self = this;
-                let newConsumeList = this.props.match.params.consumeList.split(",")
-                newConsumeList.push(this.state.addItemName + "|" + this.state.addAmount);
+    saveItemConsume () { 
+            let self = this;
+            let newConsumeList = this.props.match.params.consumeList.split(",")
+            newConsumeList.push(this.state.addItemName + "|" + this.state.addAmount);
 
-                axios.get('/dish/updateConsumeList/'+ self.props.match.params.dishId + '/' +   newConsumeList.join(","))
-                    .then(function (response) {
-                       if(response.success) {
-                           self.setState({consumeList: newConsumeList});
-                           self.setState({showAddItem: false})
-                       }
-                });
-        }
+            axios.get('/dish/updateConsumeList/'+ self.props.match.params.dishId + '/' +   newConsumeList.join(","))
+                .then(function (response) {
+                    if(response.success) {
+                        self.setState({consumeList: newConsumeList});
+                        self.setState({showAddItem: false})
+                    }
+            });
+    }
     showAdd () {
         this.setState({showAddItem: true})
     }
@@ -85,7 +82,7 @@ export default class DishConsumeEdit extends Component {
             <div>
                 <NavBar
                     mode="light"
-                    icon={<Icon type="ellipsis" />}
+                    icon={<Icon type="left" />}
                     onLeftClick={() => {
                         this.props.history.goBack();
                     

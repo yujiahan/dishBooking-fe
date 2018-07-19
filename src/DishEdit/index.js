@@ -13,7 +13,6 @@ export default class DishEdit extends Component {
   }
   changeTab = (tabName) =>{
       this.setState({tab: tabName, open: false});
-
   }
   render() {
     const sidebar = (<List>
@@ -23,16 +22,15 @@ export default class DishEdit extends Component {
 
     return (<div  style={{ height: '100%' }}>
                 <NavBar
-                mode="light"
-                icon={<Icon type="ellipsis" />}
-                onLeftClick={() => {
-                    this.onOpenChange();
-                
-                }}
-                rightContent={[
-                    <Icon key="0" type="search" style={{ marginRight: '16px' }} />,
-                    <Icon key="1" type="ellipsis" />,
-                ]}
+                    mode="light"
+                    icon={<Icon type="left" />}
+                    onLeftClick={() => {
+                        this.props.history.goBack();
+                    }}
+                    rightContent={[
+                        <Icon key="1" type="ellipsis"   onClick={()=>{
+                            this.onOpenChange()}}/>,
+                    ]}
                 >xx编辑</NavBar>       
                 <Drawer
                     className="my-drawer"
