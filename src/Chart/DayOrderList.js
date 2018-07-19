@@ -17,10 +17,10 @@ export default class DayOrder extends Component {
 
     }
     pullData() {
-        axios.get('/chart/getDishRank').then((response) => {
+        axios.get('/chart/getOrderDetailList').then((response) => {
             var newState = {
                 lastUpdateTime: moment().format('YYYY:MM:DD hh:mm:ss'),
-                data: response.data
+                data: response.data.data
             }
             this.setState({orderData: newState}) 
     

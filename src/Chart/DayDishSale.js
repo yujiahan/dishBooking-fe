@@ -20,7 +20,7 @@ export default class DaySale extends Component {
         axios.get('/chart/getDishRank').then((response) => {
             var newState = {
                 lastUpdateTime: moment().format('YYYY:MM:DD hh:mm:ss'),
-                data: response.data
+                data: response.data.data
             }
             this.setState({saleData: newState}) 
     
