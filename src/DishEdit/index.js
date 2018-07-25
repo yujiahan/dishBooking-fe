@@ -6,7 +6,7 @@ import ConsumeImport from './ConsumeImport'
 export default class DishEdit extends Component {
   state = {
     open: false,
-    tab: "item"
+    tab: "consume"
   }
   onOpenChange = () => {
     this.setState({ open: !this.state.open });
@@ -16,8 +16,9 @@ export default class DishEdit extends Component {
   }
   render() {
     const sidebar = (<List>
-                        <List.Item key={0} onClick={()=> {this.changeTab('item')}} >xxx1</List.Item>
-                        <List.Item key={1} onClick={()=> {this.changeTab('consume')}}>xxx2</List.Item>
+                        
+                        <List.Item key={0} onClick={()=> {this.changeTab('consume')}}>xxx2</List.Item>
+                        <List.Item key={1} onClick={()=> {this.changeTab('item')}} >xxx1</List.Item>
                     </List>);
 
     return (<div  style={{ height: '100%' }}>

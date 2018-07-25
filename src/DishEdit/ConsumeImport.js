@@ -4,12 +4,7 @@ import {
     Link
   } from 'react-router-dom'
 import axios from 'axios'
-const SORTMAP = new Map([
-    ['meat', '肉类'],
-    ['vegat', '蔬菜'],
-    ['flavor', '调料']
-]
-);
+import { SORTMAP }  from './common.js'
 const pickerData = [[]];
 for (let [k, v] of SORTMAP) {
     pickerData[0].push({
@@ -19,22 +14,33 @@ for (let [k, v] of SORTMAP) {
 }
 export default class ConsumeImport extends Component {
     state = {
-        dishList: [
-            {code : 123,  name: "cai1", consume_list: "牛肉|3,青笋|1"},
-            {code : 234,  name: "cai2"},
-            {code : 2344, name: "cai3"},
-            {code : 1233, name: "cai4"}
-        ],
-        itemList: [{
-            item_id: 1, name: "青笋",
-            item_id: 2, name: "牛肉"
-        }],
+        dishList: [],
         sortValue: 'meat',
     }
-
+    componentDidMount(){
+        let self = this;
+        axios.get('/dish/getAllDish')
+            .then(function (response) {
+                self.setState({ dishList: response.data })
+        });
+    }
+    pullDishData(){
+        let self = this;
+        axios.get('/dish/updateDish')
+            .then(function (response) {
+               if(response.data.success > 0) {
+                    Toast.show("更新了" + response.data.success  + "条数据");
+                    axios.get('/dish/getAllDish')
+                        .then(function (newDishResponse) {
+                            self.setState({ dishList: newDishResponse.data })
+                    });
+               }
+        });
+    }
     render() {
         return (
             <div>
+                <Button>从二维火拉取菜品</Button>
                 <Grid   data={this.state.dishList}
                         columnNum={3}
                         renderItem={dataItem => (

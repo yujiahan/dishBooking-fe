@@ -1,13 +1,8 @@
 import React, { Component } from 'react'
 import { Flex, List,  WhiteSpace, Toast, Picker, Button, InputItem, NavBar, Icon } from 'antd-mobile'
 import axios from 'axios'
+import { SORTMAP }  from './common.js'
 
-const SORTMAP = new Map([
-        ['meat', '肉类'],
-        ['vegat', '蔬菜'],
-        ['flavor', '调料']
-    ]
-);
 const ItemMap = {
     'meat': [
         {
@@ -51,7 +46,7 @@ export default class DishConsumeEdit extends Component {
         addAmount: ""
     }
     componentDidMount(){
-        let consumeList = this.props.match.params.consumeList.split(",");
+        let consumeList = this.props.match.params.consumeList !=="null"? this.props.match.params.consumeList.split(","): [];
         
         this.setState({consumeList: consumeList});
     }
@@ -60,16 +55,35 @@ export default class DishConsumeEdit extends Component {
         this.setState({consumeList: this.state.consumeList})
       
     }
+    saveCurrentItem(){
+        var self = this;
+        var hasDuplicatItem = this.state.consumeList.some((item) => { //是否有重复元素
+            return self.state.addItemName  === item.split("|")[0];
+        })
+        if(hasDuplicatItem) {
+            Toast.show("有重复元素");
+
+            return;
+        } 
+        this.state.consumeList.push(this.state.addItemName + "|" + this.state.addAmount)
+        this.setState({consumeList:this.state.consumeList});
+        this.clearNewAddinput();
+
+    }
+    clearNewAddinput(){
+        this.setState({
+            showAddItem: false,
+            addItemName: ItemMap.meat[0].value,
+            addAmount: ""
+        })
+    }
     saveItemConsume () { 
             let self = this;
-            let newConsumeList = this.props.match.params.consumeList.split(",")
-            newConsumeList.push(this.state.addItemName + "|" + this.state.addAmount);
 
-            axios.get('/dish/updateConsumeList/'+ self.props.match.params.dishId + '/' +   newConsumeList.join(","))
+            axios.get('/dish/updateConsumeList/'+ self.props.match.params.dishId + '/' +   this.state.consumeList.join(","))
                 .then(function (response) {
-                    if(response.success) {
-                        self.setState({consumeList: newConsumeList});
-                        self.setState({showAddItem: false})
+                    if(response.data.success) {
+                        Toast.show("保存成功")
                     }
             });
     }
@@ -141,13 +155,14 @@ export default class DishConsumeEdit extends Component {
                                     }} placeholder="数量" />
                                 </Flex.Item>
                                 <Flex.Item>
-                                    <Button size="small" onClick={()=>{ this.saveItemConsume()}}>保存</Button>
+                                    <Button size="small" onClick={()=>{ this.saveCurrentItem()}}>暂存</Button>
                                 </Flex.Item>
                             </Flex>
                         </List.Item>
                     }
                 </List>
                 <Button onClick={()=>{this.showAdd()}}>add</Button>
+                <Button onClick={()=>{this.saveItemConsume()}}>最终保存</Button>
             </div>
         )
       }

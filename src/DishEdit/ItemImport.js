@@ -1,12 +1,8 @@
 import React, { Component } from 'react'
 import { Flex, List,  WhiteSpace, Toast, Picker, Button, InputItem } from 'antd-mobile'
 import axios from 'axios'
-const SORTMAP = new Map([
-                            ['meat', '肉类'],
-                            ['vegat', '蔬菜'],
-                            ['flavor', '调料']
-                        ]
-                );
+import { SORTMAP }  from './common.js'
+
 const pickerData = [[]];
 for (let [k,v] of SORTMAP) {
         pickerData[0].push({
@@ -19,33 +15,28 @@ export default class ItemImport extends Component {
         dishName: "",
         sortValue: 'meat',
         remark: "",
-        itemList: [
-            {
-                code: 1,
-                name: "qingsun"
-            }, {
-                code: 2,
-                name: "niurou"
-            }
-        ]
+        itemList: []
     }
     componentWillMount() {
-        //this.getAllItemList();
+        this.getAllItemList();
     }
     getAllItemList() {
         let self = this;
         axios.get('/dish/getAllItem')
             .then(function (response) {
-                self.state.setState({ itemlist: response })
+                self.setState({ itemList: response.data })
             });
     }
 
     addDishItem(sortVal, dishName, remark) {
-        axios.get('/dish/addItem/' + sortVal + "/" + dishName + "/" + remark).then((response) => {
-            if (response.success) {
+        axios.get('/dish/addItem/' + sortVal + "/" + dishName + "/" + (remark||"空")).then((response) => {
+            if (response.data.success) {
                 Toast.info('添加成功')
+                this.getAllItemList();
             }
-        })
+        }).catch(function(err) {
+            Toast.info("保存失败")
+        });
     }
     render() {
         return (
@@ -84,7 +75,7 @@ export default class ItemImport extends Component {
                 <div>原料list</div>
                 {
                     this.state.itemList.map((item) => {
-                        return <p key={item.code}>{item.name}</p>
+                        return <p key={item.item_id}>{item.item_name}</p>
                     })
                 }
             </div>
