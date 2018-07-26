@@ -9,7 +9,7 @@ export default class App extends Component {
           <div>
             <div className="master">
                 <ul>
-                    <li><Link to="/mainPage/dishEdit">菜品录入</Link></li>
+                    <li><Link to="/dishEdit">菜品test录入</Link></li>
                     <li><Link to="/showChart">报表</Link></li>
                 </ul>  
             </div>

@@ -33,6 +33,7 @@ export default class ItemImport extends Component {
             if (response.data.success) {
                 Toast.info('添加成功')
                 this.getAllItemList();
+                this.setState({dishName:""})
             }
         }).catch(function(err) {
             Toast.info("保存失败")
@@ -59,8 +60,9 @@ export default class ItemImport extends Component {
                                 </Picker>
                             </Flex.Item>
                             <div style={{flex:2}}> 
-                                <InputItem onChange={(val) => {
-                                    this.setState({ dishName: val })
+                                <InputItem 
+                                    value = {this.state.dishName}
+                                    onChange={(val) => {this.setState({ dishName: val })
                                 }} placeholder="原料名称" />
                             </div>
                             <Flex.Item>

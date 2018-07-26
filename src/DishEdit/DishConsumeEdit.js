@@ -2,31 +2,12 @@ import React, { Component } from 'react'
 import { Flex, List,  WhiteSpace, Toast, Picker, Button, InputItem, NavBar, Icon } from 'antd-mobile'
 import axios from 'axios'
 import { SORTMAP }  from './common.js'
-
-const ItemMap = {
-    'meat': [
-        {
-            value: "牛肉",
-            label: "牛肉"
-        },
-        {
-            value: "鸡肉",
-            label: "鸡肉"
-        }
-    ],
-    'vegat': [
-        {
-            value: "青笋",
-            label: "青笋"
-        },
-        {
-            value: "黄瓜",
-            label: "黄瓜"
-        }
-    ]
+let ItemMap = {};
+for (var key of SORTMAP.keys()) {
+    ItemMap[key] = [];
 }
 
-const pickerData = [[]];
+let pickerData = [[]];
 
 for (let [k, v] of SORTMAP) {
     pickerData[0].push({
@@ -42,11 +23,25 @@ export default class DishConsumeEdit extends Component {
         showAddItem: false,
         sortValue: "meat",
         itemPickerData: [ItemMap.meat],
-        addItemName: ItemMap.meat[0].value,
+        addItemName: "牛肉",
         addAmount: ""
     }
     componentDidMount(){
         let consumeList = this.props.match.params.consumeList !=="null"? this.props.match.params.consumeList.split(","): [];
+        
+        axios.get('/dish/getAllItem').then(function (response) {
+                    var itemData = response.data;
+                    for (var key of SORTMAP.keys()) {
+                        itemData.forEach((item)=>{
+                            if(item.item_sort === key) {
+                                ItemMap[key].push({
+                                    value: item['item_name'],
+                                    label: item['item_name']
+                                });
+                            }
+                        })
+                    }
+        });
         
         this.setState({consumeList: consumeList});
     }

@@ -16,8 +16,8 @@ import App from './App'
 ReactDOM.render((
   <Router>    
       <div>
-        <Route path="/mainPage/dishEdit" component={DishEdit}/>  
-        <Route path="/mainPage/nav" component={App}/>  
+        <Route path="/dishEdit" component={DishEdit}/>  
+        <Route path="/nav" component={App}/>  
         <Route path="/showChart" component={Chart}/>  
         <Route path="/dishConsume/:dishId/:consumeList/:dishName" component={DishConsumeEdit}/>  
         {/* <Route path="/genChart" component={GenChart}/>   */}
