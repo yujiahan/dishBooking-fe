@@ -40,7 +40,7 @@ export default class ConsumeImport extends Component {
     render() {
         return (
             <div>
-                <Button>从二维火拉取菜品</Button>
+                <Button onClick={()=>this.pullDishData()}>从二维火拉取菜品</Button>
                 <Grid   data={this.state.dishList}
                         columnNum={3}
                         renderItem={dataItem => (
