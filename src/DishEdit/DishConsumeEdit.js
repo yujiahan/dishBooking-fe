@@ -30,18 +30,22 @@ export default class DishConsumeEdit extends Component {
         let consumeList = this.props.match.params.consumeList !=="null"? this.props.match.params.consumeList.split(","): [];
         
         axios.get('/dish/getAllItem').then(function (response) {
-                    var itemData = response.data;
-                    for (var key of SORTMAP.keys()) {
-                        itemData.forEach((item)=>{
-                            if(item.item_sort === key) {
-                                ItemMap[key].push({
-                                    value: item['item_name'],
-                                    label: item['item_name']
-                                });
-                            }
-                        })
+            var itemData = response.data;
+            
+            for (var key of SORTMAP.keys()) {
+                ItemMap[key].length = 0;
+                itemData.forEach((item)=>{
+                    if(item.item_sort === key) {
+                        ItemMap[key].push({
+                            value: item['item_name'],
+                            label: item['item_name']
+                        });
                     }
+                })
+            }
         });
+        
+       
         
         this.setState({consumeList: consumeList});
     }
@@ -60,6 +64,11 @@ export default class DishConsumeEdit extends Component {
 
             return;
         } 
+        if( self.state.addAmount === "") {
+            Toast.show("请输入数量");
+
+            return;
+        }
         this.state.consumeList.push(this.state.addItemName + "|" + this.state.addAmount)
         this.setState({consumeList:this.state.consumeList});
         this.clearNewAddinput();
@@ -67,8 +76,10 @@ export default class DishConsumeEdit extends Component {
     }
     clearNewAddinput(){
         this.setState({
+            sortValue: "meat",
+            itemPickerData: [ItemMap.meat],
+            addItemName: "牛肉",
             showAddItem: false,
-            addItemName: ItemMap.meat[0].value,
             addAmount: ""
         })
     }
@@ -86,7 +97,6 @@ export default class DishConsumeEdit extends Component {
         this.setState({showAddItem: true})
     }
     render() {
-        
         return (
             <div>
                 <NavBar
@@ -145,7 +155,9 @@ export default class DishConsumeEdit extends Component {
                                     </Picker>
                                 </Flex.Item>
                                 <Flex.Item>
-                                    <InputItem onChange={(val) => {
+                                    <InputItem 
+                                       value={this.state.addAmount}
+                                       onChange={(val) => {
                                         this.setState({ addAmount: val })
                                     }} placeholder="数量" />
                                 </Flex.Item>

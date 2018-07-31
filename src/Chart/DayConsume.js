@@ -17,35 +17,15 @@ export default class DayConsume extends Component {
 
     }
     pullData() {
-        var mockData = {
-            lastUpdateTime:"12345",
-            data: [
-                {
-                    name: "青笋", 
-                    totalConsume: 2, 
-                    saleDishList: [{
-                        name:"cai1",
-                        num: 1
-                    }, {
-                        name:"cai2",
-                        num: 2
-                    }]
-                },
-                {
-                    name: "牛肉", 
-                    totalConsume: 3, 
-                    saleDishList: [{
-                        name:"cai4",
-                        num: 2
-                    }, {
-                        name:"cai5",
-                        num: 1.4
-                    }]
-                }]
-        }
+        axios.get('/chart/getDishConsumeList').then((response) => {
+            var consumeList = {
+                lastUpdateTime: response.data.lastUpdateTime,
+                data: response.data.data
+            }
+            this.setState({consumeData : consumeList})
+            cacheConsumeData = Object.assign({}, consumeList) ;
+        })
         
-        this.setState({consumeData : mockData})
-        cacheConsumeData = Object.assign({}, mockData) ;
     }
     componentDidMount(){
         this.setState({consumeData : cacheConsumeData})
