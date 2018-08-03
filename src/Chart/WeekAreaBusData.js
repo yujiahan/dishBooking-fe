@@ -293,10 +293,11 @@ export default class WeekData extends Component {
                 </div>
                 <div>
                     <ReactEcharts option={this.state.rollOption} />
-                </div>
+                </div>               
             </Tabs>
 
         )
     }
 
 }
+
