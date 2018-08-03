@@ -9,6 +9,8 @@ import {
 import Chart from './Chart/index.js'
 import DishEdit from './DishEdit/index'
 import DishConsumeEdit from './DishEdit/DishConsumeEdit.js'
+import Import from './Import/index'
+import WeekData from './Chart/WeekAreaBusData'
 
 import App from './App'
 
@@ -19,7 +21,9 @@ ReactDOM.render((
         <Route path="/dishEdit" component={DishEdit}/>  
         <Route path="/nav" component={App}/>  
         <Route path="/showChart" component={Chart}/>  
+        <Route path="/import" component={Import}/>  
         <Route path="/dishConsume/:dishId/:consumeList/:dishName" component={DishConsumeEdit}/>  
+        <Route path="/perform" component={WeekData}/>  
         {/* <Route path="/genChart" component={GenChart}/>   */}
       </div>    
    </Router>

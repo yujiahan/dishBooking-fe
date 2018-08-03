@@ -27,7 +27,7 @@ export default class DayConsume extends Component {
         })
         
     }
-    componentDidMount(){
+    componentWillMount(){
         this.setState({consumeData : cacheConsumeData})
     }
     render() {
