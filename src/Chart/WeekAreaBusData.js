@@ -6,8 +6,8 @@ import axios from 'axios'
 
 const areaDivide = {
     'jia': 'A1|A2|A3|A4|A5|A6|C1',
-    'yi': 'B1|B2|B3|B4|B5|B6|B7|B8|B9|C2',
-    'bing': 'C3|C4|C5|C6'
+    'yi': 'B1|B2|B3|B4|B5|B6|B7|B8|B9|C3',
+    'bing': 'C2|C4|C5|C6'
 }
 const tabs = [
     { title: '营业额分区' },
@@ -136,7 +136,7 @@ export default class WeekData extends Component {
                 }
             },
             legend: {
-                data: ['A1-A6&C1', 'B1-B9&C2', 'C3-C6']
+                data: ['A1-A6&C1', 'B1-B9&C3', 'C2,C4-C6']
             },
             dataZoom: [{
                 startValue: '20180430'
@@ -163,7 +163,7 @@ export default class WeekData extends Component {
                     }
                 },
                 {
-                    name: 'B1-B9&C2',
+                    name: 'B1-B9&C3',
                     type: 'line',
                     data: data.map((item) => {
                         return item.areaAmount.yi;
@@ -181,7 +181,7 @@ export default class WeekData extends Component {
                     }
                 },
                 {
-                    name: 'C3-C6',
+                    name: 'C2,C4-C6',
                     type: 'line',
                     data: data.map((item) => {
                         return item.areaAmount.bing;
