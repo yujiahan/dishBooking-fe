@@ -10,7 +10,7 @@ import Chart from './Chart/index.js'
 import DishEdit from './DishEdit/index'
 import DishConsumeEdit from './DishEdit/DishConsumeEdit.js'
 import Import from './Import/index'
-import WeekData from './Chart/WeekAreaBusData'
+import WeekData from './Perform/WeekAreaBusData'
 
 import App from './App'
 
