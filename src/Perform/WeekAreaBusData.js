@@ -6,9 +6,11 @@ import axios from 'axios'
 const Busin_First_Bonus  = 60,
       Busin_Second_Bonus = 20,
       Busin_Growth_Bonus = 40, //每增长10%奖金
+      Busin_Drop_Bonus = 20, //每增长10%奖金
       Roll_First_Bonus = 60,
       Roll_Second_Bonus = 20,
-      Roll_Growth_Bonus = 40; //每增长0.1奖金
+      Roll_Growth_Bonus = 40, //每增长0.1奖金
+      Roll_Drop_Bonus = 20; //每增长0.1奖金
 
 
 const areaDivide = {
@@ -404,18 +406,35 @@ export default class WeekData extends Component {
 
         var growthBonus = { //增长奖金
             'jia': {
-                'busin': parseInt((thisWeekBusDataAverge.jia/lastFiveWeekBusDataAverge.jia -1 )/0.1)* Busin_Growth_Bonus,
-                'roll': parseInt((thisWeekRollAverge.jia - lastFiveWeekRollAverge.jia)/0.1)* Roll_Growth_Bonus
+                'busin': this.computeGrowthBonus('busin', 'jia',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge),
+                'roll': this.computeGrowthBonus('roll', 'jia',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge)
             },
             'yi': {
-                'busin': parseInt((thisWeekBusDataAverge.yi/lastFiveWeekBusDataAverge.yi -1 )/0.1)* Busin_Growth_Bonus,
-                'roll': parseInt((thisWeekRollAverge.yi - lastFiveWeekRollAverge.yi)/0.1)* Roll_Growth_Bonus
+                'busin': this.computeGrowthBonus('busin', 'yi',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge),
+                'roll': this.computeGrowthBonus('roll', 'yi',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge)
             },
             'bing': {
-                'busin': parseInt((thisWeekBusDataAverge.bing/lastFiveWeekBusDataAverge.bing -1 )/0.1)* Busin_Growth_Bonus,
-                'roll': parseInt((thisWeekRollAverge.bing - lastFiveWeekRollAverge.bing)/0.1)* Roll_Growth_Bonus
+                'busin': this.computeGrowthBonus('busin', 'bing',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge),
+                'roll': this.computeGrowthBonus('roll', 'bing',thisWeekBusDataAverge,lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge)
             }           
         }
+       
+        var finalBonus = this.computeFinalBonus(initBonus, growthBonus)
+    }
+    computeGrowthBonus(type, areaName, thisWeekBusDataAverge , lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge) { //计算个人涨幅奖金
+        if (type === 'busin') {
+            return thisWeekBusDataAverge[areaName] > lastFiveWeekBusDataAverge[areaName] ? //区域营业额增长
+                    parseInt((thisWeekBusDataAverge[areaName]/lastFiveWeekBusDataAverge[areaName] - 1 )/0.1)* Busin_Growth_Bonus :
+                    parseInt((thisWeekBusDataAverge[areaName]/lastFiveWeekBusDataAverge[areaName] - 1 )/0.1)* Busin_Drop_Bonus
+        } 
+        if (type === 'roll') {
+            return thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName] ? // 翻台率是否增长
+                     parseInt((thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName])/0.1)* Roll_Growth_Bonus:
+                     parseInt((thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName])/0.1)* Roll_Drop_Bonus
+        }
+    }
+
+    computeFinalBonus(initBonus,  growthBonus) {
         var finalBonus = {
             'jia': {
                 'busin': 0,
@@ -434,6 +453,21 @@ export default class WeekData extends Component {
                 'roll': 0
             }           
         }
+        var busHasDrop = growthBonus.jia.busin < 0 || growthBonus.yi.busin < 0 || growthBonus.bing.busin ;
+        var rollHasDrop = growthBonus.jia.roll < 0 || growthBonus.yi.roll < 0 || growthBonus.bing.roll ;
+        
+        finalBonus.jia.busin = initBonus.jia.busin + growthBonus.jia.busin;
+        finalBonus.jia.roll = initBonus.jia.roll + growthBonus.jia.roll;
+
+        finalBonus.yi.busin = initBonus.yi.busin + growthBonus.yi.busin;
+        finalBonus.yi.roll = initBonus.yi.roll + growthBonus.yi.roll;
+
+        finalBonus.bing.busin = initBonus.bing.busin + growthBonus.bing.busin;
+        finalBonus.bing.roll = initBonus.bing.roll + growthBonus.bing.roll;
+
+
+        debugger;
+    
     }
     findFirstAndSecondOne(obj){
         var firstValue = 0;
