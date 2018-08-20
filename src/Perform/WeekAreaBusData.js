@@ -8,7 +8,8 @@ const Busin_First_Bonus  = 1,
       Busin_Growth_Bonus = 1, //每增长10%奖金
       Roll_First_Bonus = 3,
       Roll_Second_Bonus = 1,
-      Roll_Growth_Bonus = 1 ;//每增长0.1奖金
+      Roll_Growth_Bonus = 1,//每增长0.1奖金
+      Roll_Drop_Bonus = 1;//每降低0.1扣除
 
 
 const areaDivide = {
@@ -33,7 +34,8 @@ export default class WeekData extends Component {
         },
         rollOption: {
            
-        }
+        },
+        lastDateData: null
 
     }
 
@@ -79,7 +81,8 @@ export default class WeekData extends Component {
             dataForBusin: dataForBusin,
             dataForRoll: dataForRoll,
             performOption: this.getPerOption(dataForBusin),
-            rollOption: this.getRollOption(dataForRoll)
+            rollOption: this.getRollOption(dataForRoll),
+            lastDateData: moment(serverData[serverData.length -1].Date).format("YYYYMMDD")
         })
     }
 
@@ -426,13 +429,20 @@ export default class WeekData extends Component {
     }
     computeGrowthBonus(type, areaName, thisWeekBusDataAverge , lastFiveWeekBusDataAverge, thisWeekRollAverge , lastFiveWeekRollAverge) { //计算个人涨幅奖金
         if (type === 'busin') {
-            return thisWeekBusDataAverge[areaName] > lastFiveWeekBusDataAverge[areaName] > 0 ? //区域营业额增长
+            var bonus = thisWeekBusDataAverge[areaName] > lastFiveWeekBusDataAverge[areaName] > 0 ? //区域营业额增长
                     parseInt((thisWeekBusDataAverge[areaName]/lastFiveWeekBusDataAverge[areaName] - 1 )/0.1)* Busin_Growth_Bonus :
                     0
+            if(thisWeekBusDataAverge[areaName] / lastFiveWeekBusDataAverge[areaName] < 0.85){ // 低于基线 15%，则没有基础积分;
+                bonus = 0;
+            }        
+            return bonus;
         } 
         if (type === 'roll') {
-            return thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName] >0 ? // 翻台率是否增长
-                     parseInt((thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName])/0.1)* Roll_Growth_Bonus: 0
+            var bonus =  thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName] > 0 ? // 翻台率是否增长
+                     parseInt((thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName])/0.1)* Roll_Growth_Bonus: 
+                     parseInt((thisWeekRollAverge[areaName]- lastFiveWeekRollAverge[areaName])/0.1)* Roll_Drop_Bonus
+            
+            return bonus;
         }
     }
 
@@ -457,42 +467,38 @@ export default class WeekData extends Component {
         var rollHasDrop = growthBonus.jia.roll < 0 || growthBonus.yi.roll < 0 || growthBonus.bing.roll ;
         
         finalBonus.jia.busin = initBonus.jia.busin + growthBonus.jia.busin;
-        finalBonus.jia.roll = initBonus.jia.roll + growthBonus.jia.roll;
+        finalBonus.jia.roll = (initBonus.jia.roll + growthBonus.jia.roll) < 0? 0 :(initBonus.jia.roll + growthBonus.jia.roll);
 
         finalBonus.yi.busin = initBonus.yi.busin + growthBonus.yi.busin;
-        finalBonus.yi.roll = initBonus.yi.roll + growthBonus.yi.roll;
+        finalBonus.yi.roll = (initBonus.yi.roll + growthBonus.yi.roll) < 0? 0 :(initBonus.yi.roll + growthBonus.yi.roll);
 
         finalBonus.bing.busin = initBonus.bing.busin + growthBonus.bing.busin;
-        finalBonus.bing.roll = initBonus.bing.roll + growthBonus.bing.roll;
+        finalBonus.bing.roll = (initBonus.bing.roll + growthBonus.bing.roll) < 0? 0 :(initBonus.bing.roll + growthBonus.bing.roll);
 
-        finalBonus.otherTotal = growthBonus.jia.busin + growthBonus.yi.busin + growthBonus.bing.busin +
-                                growthBonus.jia.roll + growthBonus.yi.roll + growthBonus.bing.roll + 
-                                initBonus.jia.busin + initBonus.yi.busin + initBonus.bing.busin +
-                                initBonus.jia.roll + initBonus.yi.roll + initBonus.bing.roll
+        finalBonus.otherTotal = finalBonus.jia.busin + finalBonus.jia.roll +
+                                finalBonus.yi.busin + finalBonus.yi.roll +
+                                finalBonus.bing.busin + finalBonus.bing.roll;
 
-        var onePointEqualMoney = 0;  //85-95 一分10元    2：95-105 一分20元  3：>105   涨10+10元
+        var onePointEqualMoney = 0;  // >80% 每涨10% 奖金增加10块
 
         var growthRate = thisWeekTotalBusin/lastFiveWeekTotalBusin;
-        if(growthRate < 0.95 && growthRate > 0.85) {
-            onePointEqualMoney = 10;
-        } else if (growthRate < 1.05 && growthRate >= 0.95) {
-            onePointEqualMoney = 20;
-        } else if (growthRate >= 1.05) {
-            onePointEqualMoney = 20 + parseInt((growthRate-1.05)/0.1) * 10;
+        
+        if (growthRate >= 0.8) {
+            onePointEqualMoney = parseInt((growthRate-0.7)/0.1) * 10;
         }
         finalBonus.totalBonus = finalBonus.otherTotal* onePointEqualMoney * 2;
 
         console.log('本周总奖金： '+ finalBonus.totalBonus + "; " + 
-                    " 其中A区营业额奖金：" + (initBonus.jia.busin +  growthBonus.jia.busin)* onePointEqualMoney + "元；" +
-                    " 其中A区翻台率奖金：" + (initBonus.jia.roll +  growthBonus.jia.roll)* onePointEqualMoney + "元；" +
-                    " 其中B区营业额奖金：" + (initBonus.yi.busin +  growthBonus.yi.busin)* onePointEqualMoney + "元；" + 
-                    " 其中B区翻台率奖金：" + (initBonus.yi.roll +  growthBonus.yi.roll)* onePointEqualMoney + "元；" + 
-                    " 其中C区营业额奖金：" + (initBonus.bing.busin +  growthBonus.bing.busin)* onePointEqualMoney + "元；" + 
-                    " 其中C区翻台率奖金：" + (initBonus.bing.roll +  growthBonus.bing.roll)* onePointEqualMoney + "元；" + 
+                    " 其中A区营业额奖金：" + (finalBonus.jia.busin)* onePointEqualMoney + "元；" +
+                    " 其中A区翻台率奖金：" + (finalBonus.jia.roll)* onePointEqualMoney + "元；" +
+                    " 其中B区营业额奖金：" + (finalBonus.yi.busin)* onePointEqualMoney + "元；" + 
+                    " 其中B区翻台率奖金：" + (finalBonus.yi.roll)* onePointEqualMoney + "元；" + 
+                    " 其中C区营业额奖金：" + (finalBonus.bing.busin)* onePointEqualMoney + "元；" + 
+                    " 其中C区翻台率奖金：" + (finalBonus.bing.roll)* onePointEqualMoney + "元；" + 
                      "其他人总奖金：" + finalBonus.otherTotal * onePointEqualMoney   )
 
     }
-    computePointMeetBonus() {
+    computeAreaTotal() {  //该区域总分数 翻台奖金 + 营业额奖金
 
     }
     findFirstAndSecondOne(obj){
@@ -524,6 +530,7 @@ export default class WeekData extends Component {
         return (
             <Tabs tabs={tabs} initialPage={0} animated={false} useOnPan={false}>
                 <div>
+                    <p> 后台数据目前同步到：{this.state.lastDateData},不是最新手动同步数据 </p>
                     <p onClick={()=>this.setState({dateShow: true})}>选择日期</p>
                     <Calendar
                         type ="one"
